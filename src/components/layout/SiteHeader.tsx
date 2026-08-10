@@ -87,7 +87,7 @@ export function SiteHeader() {
       </div>
 
       {/* Tablet nav row */}
-      <div className="border-t border-border/70 md:block lg:hidden">
+      <div className="hidden border-t border-border/70 md:block lg:hidden">
         <nav aria-label="Secondary" className="container-page flex gap-1 overflow-x-auto py-2">
           {navItems.map((item) => (
             <Link
