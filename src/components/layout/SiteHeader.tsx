@@ -3,6 +3,7 @@ import { Menu } from "lucide-react";
 import { useState } from "react";
 
 import { Logo } from "@/components/brand/Logo";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
@@ -16,6 +17,9 @@ const navItems = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { isAuthenticated, isAdmin, signOut } = useAuth();
+  const dashboardTo = isAdmin ? "/admin" : "/dashboard";
+  const dashboardLabel = isAdmin ? "Admin Dashboard" : "Dashboard";
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-background/85 backdrop-blur-md">
@@ -39,12 +43,28 @@ export function SiteHeader() {
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/login">Login</Link>
-          </Button>
-          <Button asChild size="sm" className="rounded-full px-5">
-            <Link to="/register">Register</Link>
-          </Button>
+          {isAuthenticated ? (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link to={dashboardTo}>{dashboardLabel}</Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/profile">Profile</Link>
+              </Button>
+              <Button size="sm" className="rounded-full px-5" onClick={() => void signOut()}>
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button asChild size="sm" className="rounded-full px-5">
+                <Link to="/register">Register</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <Sheet open={open} onOpenChange={setOpen}>
@@ -72,12 +92,33 @@ export function SiteHeader() {
                 ))}
               </nav>
               <div className="mt-auto flex flex-col gap-2">
-                <Button asChild variant="outline" onClick={() => setOpen(false)}>
-                  <Link to="/login">Login</Link>
-                </Button>
-                <Button asChild onClick={() => setOpen(false)}>
-                  <Link to="/register">Register</Link>
-                </Button>
+                {isAuthenticated ? (
+                  <>
+                    <Button asChild variant="outline" onClick={() => setOpen(false)}>
+                      <Link to={dashboardTo}>{dashboardLabel}</Link>
+                    </Button>
+                    <Button asChild variant="outline" onClick={() => setOpen(false)}>
+                      <Link to="/profile">Profile</Link>
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setOpen(false);
+                        void signOut();
+                      }}
+                    >
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button asChild variant="outline" onClick={() => setOpen(false)}>
+                      <Link to="/login">Login</Link>
+                    </Button>
+                    <Button asChild onClick={() => setOpen(false)}>
+                      <Link to="/register">Register</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </SheetContent>
