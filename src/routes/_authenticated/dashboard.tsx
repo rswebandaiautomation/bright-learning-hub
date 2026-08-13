@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { courses } from "@/data/content";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -66,11 +67,14 @@ const projects = [
 ];
 
 function Dashboard() {
+  const { profile, user } = useAuth();
+  const displayName = profile?.full_name?.trim() || user?.email?.split("@")[0] || "learner";
+
   return (
     <AppShell
       items={navItems}
       role="Student"
-      title="Welcome back, Ada"
+      title={`Welcome back, ${displayName}`}
       subtitle="Here is your learning progress this week"
     >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

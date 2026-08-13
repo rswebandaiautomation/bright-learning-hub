@@ -1,4 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+
+import { supabase } from "@/integrations/supabase/client";
 import {
   Award,
   BookOpen,
@@ -26,6 +28,16 @@ import {
 } from "@/components/ui/table";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  beforeLoad: async () => {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) throw redirect({ to: "/login" });
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userData.user.id);
+    const isAdmin = (roles ?? []).some((row) => row.role === "admin");
+    if (!isAdmin) throw redirect({ to: "/dashboard" });
+  },
   head: () => ({
     meta: [
       { title: "Admin Dashboard — BELIGHT TECH" },
