@@ -5,6 +5,7 @@ import { useState, type ReactNode } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 export type ShellNavItem = { label: string; icon: LucideIcon };
@@ -56,6 +57,15 @@ export function AppShell({
 }) {
   const [active, setActive] = useState(items[0]?.label ?? "");
   const [open, setOpen] = useState(false);
+  const { profile, user, signOut } = useAuth();
+  const displayName = profile?.full_name?.trim() || user?.email || "";
+  const badge =
+    displayName
+      .split(/[\s@.]+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("") || "BT";
 
   return (
     <div className="flex min-h-screen bg-surface">
@@ -65,11 +75,13 @@ export function AppShell({
           {role}
         </p>
         <NavList items={items} active={active} onSelect={setActive} />
-        <Button asChild variant="ghost" className="mt-auto justify-start gap-3 text-muted-foreground">
-          <Link to="/">
-            <LogOut className="h-4 w-4" />
-            Exit dashboard
-          </Link>
+        <Button
+          variant="ghost"
+          className="mt-auto justify-start gap-3 text-muted-foreground"
+          onClick={() => void signOut()}
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
         </Button>
       </aside>
 
@@ -95,8 +107,15 @@ export function AppShell({
                         setOpen(false);
                       }}
                     />
-                    <Button asChild variant="outline" className="mt-auto">
-                      <Link to="/">Exit dashboard</Link>
+                    <Button
+                      variant="outline"
+                      className="mt-auto"
+                      onClick={() => {
+                        setOpen(false);
+                        void signOut();
+                      }}
+                    >
+                      Logout
                     </Button>
                   </div>
                 </SheetContent>
@@ -106,9 +125,13 @@ export function AppShell({
                 <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
               </div>
             </div>
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary-soft text-sm font-bold text-primary">
-              BT
-            </span>
+            <Link
+              to="/profile"
+              aria-label="Open profile"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary-soft text-sm font-bold text-primary"
+            >
+              {badge}
+            </Link>
           </div>
         </header>
 
